@@ -73,7 +73,7 @@ module Berkshelf
         git %|reset --hard #{@revision}|
 
         if rel
-          git %|filter-branch --subdirectory-filter "#{rel}"|
+          git %|filter-branch --subdirectory-filter "#{rel}" --force|
         end
       end
 
