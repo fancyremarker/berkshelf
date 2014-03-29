@@ -81,6 +81,8 @@ module Berkshelf
       def install_from_lockfile
         dependencies = lockfile.graph.locks.values
 
+        download_scm_locations(dependencies)
+
         # Only construct the universe if we are going to download things
         unless dependencies.all?(&:downloaded?)
           build_universe
@@ -108,12 +110,7 @@ module Berkshelf
 
         resolver = Resolver.new(berksfile, dependencies)
 
-        # Download all SCM locations first, since they might have additional
-        # constraints that we don't yet know about
-        dependencies.select(&:scm_location?).each do |dependency|
-          Berkshelf.formatter.fetch(dependency)
-          dependency.download
-        end
+        download_scm_locations(dependencies)
 
         # Unlike when installing from the lockfile, we _always_ need to build
         # the universe when installing from the universe... duh
@@ -132,6 +129,17 @@ module Berkshelf
         end
 
         [dependencies, cookbooks]
+      end
+
+      # Download all SCM locations first, since they might have additional
+      # constraints that we don't yet know about.
+      #
+      # @param [Array<Dependency>] dependencies
+      def download_scm_locations(dependencies)
+        dependencies.select(&:scm_location?).each do |dependency|
+          Berkshelf.formatter.fetch(dependency)
+          dependency.download
+        end
       end
   end
 end
