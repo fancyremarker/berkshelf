@@ -253,14 +253,7 @@ Feature: Lifecycle commands
       """
       cookbook 'fake'
       """
-    * I write to "Berksfile.lock" with:
-       """
-      DEPENDENCIES
-        fake
-
-      GRAPH
-        fake (1.0.0)
-       """
+    * I successfully run `berks install`
     * I have a Berksfile pointing at the local Berkshelf API with:
       """
       cookbook 'fake', path: './fake'
@@ -272,14 +265,5 @@ Feature: Lifecycle commands
       version '2.0.0'
       """
     * I successfully run `berks install`
-    * the file "Berksfile.lock" should contain:
-      """
-      DEPENDENCIES
-        fake
-          path: ./fake
-
-      GRAPH
-        fake (2.0.0)
-      """
     * the output should not contain "Using fake (1.0.0)"
     * the output should contain "Using fake (2.0.0)"
