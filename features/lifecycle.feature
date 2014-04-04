@@ -251,15 +251,28 @@ Feature: Lifecycle commands
   Scenario: Switching a dependency to a new location
     * I have a Berksfile pointing at the local Berkshelf API with:
       """
-      cookbook 'fake'
+      metadata
+      """
+    * I write to "metadata.rb" with:
+      """
+      name 'foobar'
+      version '1.0.0'
+      depends 'fake'
       """
     * I write to "Berksfile.lock" with:
        """
       DEPENDENCIES
+        foobar
+          path: .
+          metadata: true
         fake
 
       GRAPH
+        foobar (1.0.0)
+          fake (>= 0.0.0)
         fake (1.0.0)
+          efak (>= 0.0.0)
+        efak (1.0.0)
        """
     * I have a Berksfile pointing at the local Berkshelf API with:
       """
@@ -270,16 +283,24 @@ Feature: Lifecycle commands
       """
       name 'fake'
       version '2.0.0'
+      depends 'efak'
       """
     * I successfully run `berks install`
     * the file "Berksfile.lock" should contain:
       """
       DEPENDENCIES
+        foobar
+          path: .
+          metadata: true
         fake
           path: ./fake
 
       GRAPH
+        foobar (1.0.0)
+          fake (>= 0.0.0)
         fake (2.0.0)
+          efak (>= 0.0.0)
+        efak (1.0.0)
       """
     * the output should not contain "Using fake (1.0.0)"
     * the output should contain "Using fake (2.0.0)"
